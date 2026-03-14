@@ -26,7 +26,7 @@ import frc.robot.subsystems.ClimberSubsystem;
 import frc.robot.subsystems.CommandSwerveDrivetrain;
 
 public class RobotContainer {
-    private double MaxSpeed = 0.25 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
+    private double MaxSpeed = 0.50 * TunerConstants.kSpeedAt12Volts.in(MetersPerSecond); // kSpeedAt12Volts desired top speed
     private double MaxAngularRate = RotationsPerSecond.of(0.75).in(RadiansPerSecond); // 3/4 of a rotation per second max angular velocity
 
     /* Setting up bindings for necessary control of the swerve drive platform */
@@ -39,6 +39,8 @@ public class RobotContainer {
     private final Telemetry logger = new Telemetry(MaxSpeed);
 
     private final CommandXboxController joystick = new CommandXboxController(0);
+    private final CommandXboxController oporator = new CommandXboxController(1);
+
 
     public final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain();
     private final CANFuelSubsystem fuelSubsystem = new CANFuelSubsystem();
@@ -62,17 +64,17 @@ public class RobotContainer {
         
 
     // While the left bumper on operator controller is held, intake Fuel
-    joystick.leftBumper().whileTrue(new Intake(fuelSubsystem));
+    oporator.leftBumper().whileTrue(new Intake(fuelSubsystem));
     // While the right bumper on the operator controller is held, spin up for 1
     // second, then launch fuel. When the button is released, stop.
-    joystick.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
+    oporator.rightBumper().whileTrue(new LaunchSequence(fuelSubsystem));
     // While the A button is held on the operator controller, eject fuel back out
     // the intake
-    joystick.a().whileTrue(new Eject(fuelSubsystem));
+    oporator.a().whileTrue(new Eject(fuelSubsystem));
    // While the down arrow on the directional pad is held it will unclimb the robot
-    joystick.povDown().whileTrue(new ClimbDown(climberSubsystem));
+    oporator.povDown().whileTrue(new ClimbDown(climberSubsystem));
     // While the up arrow on the directional pad is held it will cimb the robot
-    joystick.povUp().whileTrue(new ClimbUp(climberSubsystem));
+    oporator.povUp().whileTrue(new ClimbUp(climberSubsystem));
 
     // Set the default command for the drive subsystem to the command provided by
     // factory with the values provided by the joystick axes on the driver
@@ -105,7 +107,7 @@ public class RobotContainer {
         // joystick.start().and(joystick.x()).whileTrue(drivetrain.sysIdQuasistatic(Direction.kReverse));
 
         // // Reset the field-centric heading on left bumper press.
-        // joystick.leftBumper().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
+        joystick.back().and(joystick.start()).onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         // drivetrain.registerTelemetry(logger::telemeterize);
     }
