@@ -10,11 +10,14 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -24,6 +27,7 @@ public class CANFuelSubsystem extends SubsystemBase {
   private final SparkMax LeftIntakeLauncher;
   private final SparkMax RightIntakeLauncher;
   private final SparkMax Indexer;
+  private final RelativeEncoder LauncherEncoder;
 
   /** Creates a new CANBallSubsystem. */
   public CANFuelSubsystem() {
@@ -31,6 +35,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     LeftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     RightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
     Indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
+    LauncherEncoder = LeftIntakeLauncher.getEncoder();
 
     // create the configuration for the feeder roller, set a current limit and apply
     // the config to the controller
@@ -82,5 +87,40 @@ public class CANFuelSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putNumber("Shooter RPM", LauncherEncoder.getVelocity());
   }
+  
+
+  public Command createTestShooterCommand() {
+      return runEnd(() -> {
+        double percent = SmartDashboard.getNumber("Launching launcher roller value", INTAKE_INTAKING_PERCENT);
+        setIntakeLauncherRoller(percent);
+      }, this::stop).withName("Test Shooter");
+  }
+
+  public Command createMoveLeftIntakeLauncherCommand() {
+    return runEnd(() -> {
+      LeftIntakeLauncher.set(0.5);
+
+    }, this::stop);
+  }
+
+  public Command createMoveRightIntakeLauncherCommand() {
+    return runEnd(() -> {
+      RightIntakeLauncher.set(0.5);
+
+    }, this::stop);
+  }
+  
+
+  public Command createMoveIndexerCommand() {
+    return runEnd(() -> {
+      Indexer.set(0.5);
+
+    }, this::stop);
+  }
+  
+    // LeftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    // RightIntakeLauncher = new SparkMax(RIGHT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);
+    // Indexer = new SparkMax(INDEXER_MOTOR_ID, MotorType.kBrushless);
 }
