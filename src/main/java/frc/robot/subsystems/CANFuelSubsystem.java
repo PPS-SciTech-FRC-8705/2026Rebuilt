@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.commands.Launch;
 
 import static frc.robot.Constants.FuelConstants.*;
 
@@ -41,6 +42,7 @@ public class CANFuelSubsystem extends SubsystemBase {
     // the config to the controller
     SparkMaxConfig feederConfig = new SparkMaxConfig();
     feederConfig.smartCurrentLimit(INDEXER_MOTOR_CURRENT_LIMIT);
+    feederConfig.inverted(true);
     Indexer.configure(feederConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
     // create the configuration for the launcher roller, set a current limit, set
@@ -63,6 +65,9 @@ public class CANFuelSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Intaking intake roller value", INTAKE_INTAKING_PERCENT);
     SmartDashboard.putNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT);
     SmartDashboard.putNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT);
+    SmartDashboard.putNumber("Launching launcher RPM", 2150);
+    SmartDashboard.putNumber("Shooter KF", 0.000166);
+    SmartDashboard.putNumber("Shooter KP", 0.0007);
     //SmartDashboard.putNumber("Spin-up feeder roller value", SPIN_UP_FEEDER_VOLTAGE);
   }
 
@@ -89,6 +94,17 @@ public class CANFuelSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
     SmartDashboard.putNumber("Shooter RPM", LauncherEncoder.getVelocity());
   }
+
+  public void spintAtTunableRpm() {
+    double goalRpm = SmartDashboard.getNumber("Launching launcher RPM", 5000);
+    double kf = SmartDashboard.getNumber("Shooter KF", 0);
+    double kp = SmartDashboard.getNumber("Shooter KP", 0);
+
+    double error = goalRpm - LauncherEncoder.getVelocity();
+    double output = kf * goalRpm + kp * error;
+
+    setIntakeLauncherRoller(output);
+  }
   
 
   public Command createTestShooterCommand() {
@@ -102,14 +118,14 @@ public class CANFuelSubsystem extends SubsystemBase {
     return runEnd(() -> {
       LeftIntakeLauncher.set(0.5);
 
-    }, this::stop);
+    }, this::stop).withName("Create L Shooter");
   }
 
   public Command createMoveRightIntakeLauncherCommand() {
     return runEnd(() -> {
       RightIntakeLauncher.set(0.5);
 
-    }, this::stop);
+    }, this::stop).withName("Create Move R Shooter");
   }
   
 
@@ -117,7 +133,11 @@ public class CANFuelSubsystem extends SubsystemBase {
     return runEnd(() -> {
       Indexer.set(0.5);
 
-    }, this::stop);
+    }, this::stop).withName("Create Move Indexer");
+  }
+
+  public Command createSpinAtTunableRpm() {
+    return runEnd(this::spintAtTunableRpm, this::stop);
   }
   
     // LeftIntakeLauncher = new SparkMax(LEFT_INTAKE_LAUNCHER_MOTOR_ID, MotorType.kBrushless);

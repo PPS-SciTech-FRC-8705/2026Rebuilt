@@ -20,6 +20,7 @@ public class ClimberSubsystem extends SubsystemBase {
   public ClimberSubsystem() {
     // create brushed motors for each of the motors on the launcher mechanism
     climberMotor = new TalonSRX(CLIMBER_MOTOR_ID);
+    climberMotor.setInverted(true);
 
     // create the configuration for the climb moter, set a current limit and apply
     // the config to the controller

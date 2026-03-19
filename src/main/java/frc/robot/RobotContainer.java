@@ -8,8 +8,13 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.swerve.SwerveModule.DriveRequestType;
 import com.ctre.phoenix6.swerve.SwerveRequest;
+import com.pathplanner.lib.auto.AutoBuilder;
 
+import edu.wpi.first.hal.AllianceStationID;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.simulation.DriverStationSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -18,6 +23,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.autos.ExampleAuto;
+import frc.robot.autos.PathplannerAuto;
+import frc.robot.autos.jinglejangleauto;
 import frc.robot.commands.ClimbDown;
 import frc.robot.commands.ClimbUp;
 import frc.robot.commands.Eject;
@@ -55,8 +62,18 @@ public class RobotContainer {
     public RobotContainer() {
         configureBindings();
 
-        autoChooser.setDefaultOption("Autonomous", new ExampleAuto(drivetrain, fuelSubsystem));
+
+        autoChooser.setDefaultOption("Example Auto", new ExampleAuto(drivetrain, fuelSubsystem));
+        autoChooser.addOption("JiingleJangle Auto", new PathplannerAuto(drivetrain, fuelSubsystem, climberSubsystem));
+        autoChooser.addOption("Jiingle Auto", new jinglejangleauto(drivetrain, fuelSubsystem, climberSubsystem));
         SmartDashboard.putData("Auto Chooser", autoChooser);
+
+        if (RobotBase.isSimulation()) {
+            DriverStationSim.setAllianceStationId(AllianceStationID.Blue1);
+            DriverStationSim.setDsAttached(true);
+            DriverStationSim.setEnabled(true);
+            DriverStation.silenceJoystickConnectionWarning(true);
+        }
     }
 
     private void configureBindings() {
@@ -124,6 +141,7 @@ public class RobotContainer {
         SmartDashboard.putData("Move left shooter", fuelSubsystem.createMoveLeftIntakeLauncherCommand());
         SmartDashboard.putData("Move right shooter", fuelSubsystem.createMoveRightIntakeLauncherCommand());
         SmartDashboard.putData("Move indexer", fuelSubsystem.createMoveIndexerCommand());
+        SmartDashboard.putData("Spin At Tunable RPM", fuelSubsystem.createSpinAtTunableRpm());
     }
 
     public Command getAutonomousCommand() {

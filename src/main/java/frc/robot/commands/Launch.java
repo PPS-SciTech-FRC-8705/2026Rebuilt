@@ -9,6 +9,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.CANFuelSubsystem;
 import static frc.robot.Constants.FuelConstants.*;
 
+import com.ctre.phoenix.motorcontrol.Faults;
+
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class Launch extends Command {
   /** Creates a new Intake. */
@@ -24,9 +26,9 @@ public class Launch extends Command {
   // appropriate values for intaking
   @Override
   public void initialize() {
-    fuelSubsystem
-        .setIntakeLauncherRoller(
-            SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
+    // fuelSubsystem
+    //     .setIntakeLauncherRoller(
+    //         SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
     fuelSubsystem.setFeederRoller(SmartDashboard.getNumber("Launching feeder roller value", INDEXER_LAUNCHING_PERCENT));
   }
 
@@ -34,11 +36,13 @@ public class Launch extends Command {
   // command doesn't require updating any values while running
   @Override
   public void execute() {
+    fuelSubsystem.spintAtTunableRpm();
   }
 
   // Called once the command ends or is interrupted. Stop the rollers
   @Override
   public void end(boolean interrupted) {
+    fuelSubsystem.stop();
   }
 
   // Returns true when the command should end.

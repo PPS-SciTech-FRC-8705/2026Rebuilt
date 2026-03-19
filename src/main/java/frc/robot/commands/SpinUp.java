@@ -24,9 +24,9 @@ public class SpinUp extends Command {
   // appropriate values for intaking
   @Override
   public void initialize() {
-    fuelSubsystem
-        .setIntakeLauncherRoller(
-            SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
+    // fuelSubsystem
+    //     .setIntakeLauncherRoller(
+    //         SmartDashboard.getNumber("Launching launcher roller value", LAUNCHING_LAUNCHER_PERCENT));
     fuelSubsystem.setFeederRoller(SmartDashboard.getNumber("Launching spin-up feeder value", INDEXER_SPIN_UP_PRE_LAUNCH_PERCENT));
   }
 
@@ -34,6 +34,7 @@ public class SpinUp extends Command {
   // command doesn't require updating any values while running
   @Override
   public void execute() {
+    fuelSubsystem.spintAtTunableRpm();
   }
 
   // Called once the command ends or is interrupted. Stop the rollers

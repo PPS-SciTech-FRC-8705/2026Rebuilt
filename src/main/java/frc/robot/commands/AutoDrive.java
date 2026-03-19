@@ -28,6 +28,7 @@ public class AutoDrive extends Command {
     addRequirements(driveSystem);
     driveSubsystem = driveSystem;
     this.xSpeed = xSpeed;
+    this.ySpeed = ySpeed;
     this.zRotation = zRotation;
   }
 

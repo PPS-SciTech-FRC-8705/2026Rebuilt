@@ -30,7 +30,5 @@ public class ExampleAuto extends SequentialCommandGroup {
         // total of 10 seconds
         new LaunchSequence(ballSubsystem).withTimeout(10)
     );
-
-
   }
 }
